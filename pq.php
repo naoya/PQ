@@ -8,19 +8,19 @@ PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, function ($e) { die($e->getMessage()
 
 /* SQL_Abstract のUIを変更したというだけでは物足りないのでもう少し考えたい */
 class PQ_Table {
-    var $_table;
-    var $_limit;
-    var $_fields = array('*');
-    var $_offset;
-    var $_order = array();
-    var $_where = array();
+    protected $_table;
+    protected $_limit;
+    protected $_fields = array('*');
+    protected $_offset;
+    protected $_order = array();
+    protected $_where = array();
 
-    function __construct ($table) {
+    public function __construct ($table) {
         $this->_table = $table;
     }
 
-    function where ($where) {
-        $this->_where =& array_merge($this->_where, $where);
+    public function where ($where) {
+        $this->_where = array_merge($this->_where, $where);
         return $this;
     }
 
@@ -37,27 +37,27 @@ class PQ_Table {
     }
     */
 
-    function fields ($fields) {
+    public function fields ($fields) {
         $this->_fields = $fields;
         return $this;
     }
    
-    function order ($order) {
+    public function order ($order) {
         $this->_order[] = $order;
         return $this;
     }
 
-    function limit ($limit) {
+    public function limit ($limit) {
         $this->_limit = $limit;
         return $this;
     }
     
-    function offset ($offset) {
+    public function offset ($offset) {
         $this->_offset = $offset;
         return $this;
     }
 
-    function to_sql() {
+    public function to_sql() {
         $sql = new SQL_Abstract();
 
         list($sql, $bind) = $sql->select(
@@ -83,15 +83,15 @@ class PQ_Table {
 }
 
 class PQ_Query extends PQ_Table {
-    var $_dsn;
-    var $_table;
+    protected $_dsn;
+    protected $_table;
 
-    function __construct($dsn, $table) {
+    public function __construct($dsn, $table) {
         $this->_dsn = $dsn;
         parent::__construct($table);
     }
 
-    function exec() {
+    public function exec() {
         $db = MDB2::connect($this->_dsn);
 
         list($sql, $binds) = $this->to_sql();
@@ -102,19 +102,19 @@ class PQ_Query extends PQ_Table {
         $rs = $st->execute($binds);
 
         $rows = $rs->fetchAll();
-        return LR( $rows );            
+        return LR( $rows );
     }
 }
 
 class PQ {
-    var $_dsn;
+    protected $_dsn;
 
-    function dsn ($dsn) {
+    public function dsn ($dsn) {
         $this->_dsn = $dsn;
         return $this;
     }
 
-    function query($table) {
+    public function query($table) {
         return new PQ_Query($this->_dsn, $table);
     }
 }
@@ -137,4 +137,4 @@ function main () {
 }
 
 main();
-?>
+
